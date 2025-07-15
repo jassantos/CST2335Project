@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'airplane_list_page.dart';
 import 'customer_list_page.dart';
@@ -25,14 +27,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -40,36 +40,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double _counter = 0;
-  late TextEditingController _controller; //this is to read what was typed
 
-
-
-  var isChecked = false;
-
-  @override
-  void initState() { //similar to onloaded=
-    super.initState();
-
-    _controller = TextEditingController(); //making _controller
+  void redirectCustomers(){
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/customer_list_page');
   }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose(); // free the memory of what was typed
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      if(_counter<99.0)
-        _counter++;
-    });
+  void redirectAirplanes(){
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/airplane_list_page');
+  }  void redirectFlights(){
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/flights_list_page');
+  }  void redirectReservation(){
+    Navigator.pop(context);
+    Navigator.pushNamed(context, '/reservation_page');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
@@ -99,8 +89,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ]
             )
+
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+         children: [ Text("hello world"),
+           ElevatedButton(
+             onPressed: () {
+               redirectCustomers();
+             },
+             child: const Text('Customers'),
+           ),]
+
         )
     );
   }
 
-}
+
