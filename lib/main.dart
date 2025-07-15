@@ -5,27 +5,23 @@ import 'flight_list_page.dart';
 import 'reservation_page.dart';
 
 void main() {
-
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  /*
-  String  getString( {  int a = 0, double b=0.0, bool c = false }){
-
-    return "hello world";
-
-  }*/
-
   @override
   Widget build(BuildContext context) {
-
-
-
     return MaterialApp(
       title: 'Flutter Demo',
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const MyHomePage(title: 'Final Group Project'),
+        '/customer_list_page': (context) => const CustomerList(),
+        '/airplane_list_page': (context) => const AirplaneList(),
+        '/flights_list_page': (context) => const FlightList(),
+        '/reservation_page': (context) => const Reservation(),
+      },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
@@ -36,7 +32,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
 
   final String title;
 
