@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'airplane_list_page.dart';
@@ -65,47 +64,30 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: Center(
-            child: Column(
-                children: [
-                  const SizedBox(height: 14),
+        child: Column(
+         children: [ Text("hello world"),
                   ElevatedButton(
-                    onPressed: (){},
+                    onPressed: redirectCustomers,
                     child: const Text('Customers'),
                   ),
                   Spacer(),
                   ElevatedButton(
-                    onPressed: (){},
+                    onPressed: redirectAirplanes,
                     child: const Text('Airplanes'),
                   ),
                   Spacer(),
                   ElevatedButton(
-                    onPressed: (){},
+                    onPressed: redirectFlights,
                     child: const Text('Flights'),
                   ),
                   Spacer(),
                   ElevatedButton(
-                    onPressed: (){},
+                    onPressed: redirectReservation,
                     child: const Text('Reservation'),
                   ),
                 ]
             )
-
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-         children: [ Text("hello world"),
-           ElevatedButton(
-             onPressed: () {
-               redirectCustomers();
-             },
-             child: const Text('Customers'),
-           ),]
-
-        )
-    );
+    ));
   }
-
+}
 

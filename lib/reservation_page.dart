@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Reservation extends StatefulWidget{
   const Reservation({super.key});
@@ -9,8 +10,16 @@ class Reservation extends StatefulWidget{
 class _ReservationState extends State<Reservation>{
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Center(
+            child: Column(
+                children: [ Text("Reservation Page"),]
+            )
+        )
+    );
   }
 
 }

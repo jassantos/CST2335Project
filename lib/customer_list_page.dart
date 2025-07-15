@@ -16,7 +16,7 @@ class _CustomerListState extends State<CustomerList>{
         ),
         body: Center(
             child: Column(
-                children: [ Text("Santiago said hello world"),]
+                children: [ Text("CustomerList Page"),]
             )
         )
     );
