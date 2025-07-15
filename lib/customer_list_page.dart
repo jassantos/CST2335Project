@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class CustomerList extends StatefulWidget{
   const CustomerList({super.key});
@@ -9,8 +10,16 @@ class CustomerList extends StatefulWidget{
 class _CustomerListState extends State<CustomerList>{
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Center(
+            child: Column(
+                children: [ Text("Santiago said hello world"),]
+            )
+        )
+    );
   }
   
 }
