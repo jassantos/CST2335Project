@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'airplane_list_page.dart';
-import 'customer_list_page.dart';
-import 'flight_list_page.dart';
-import 'reservation_page.dart';
+import 'airplane/airplane_list_page.dart';
+import 'customer/customer_list_page.dart';
+import 'flight/flight_list_page.dart';
+import 'reservation/reservation_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,13 +14,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'CST2335 Final Group Project',
       initialRoute: '/',
       routes: {
-        '/': (context) => const MyHomePage(title: 'Final Group Project'),
+        '/': (context) => const MyHomePage(title: 'CST2335 Final Group Project'),
         '/customer_list_page': (context) => const CustomerList(),
         '/airplane_list_page': (context) => const AirplaneList(),
-        '/flights_list_page': (context) => const FlightList(),
+        '/flight_list_page': (context) => const FlightList(),
         '/reservation_page': (context) => const Reservation(),
       },
       theme: ThemeData(
@@ -47,10 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void redirectAirplanes(){
     Navigator.pop(context);
     Navigator.pushNamed(context, '/airplane_list_page');
-  }  void redirectFlights(){
+  }
+  void redirectFlights(){
     Navigator.pop(context);
-    Navigator.pushNamed(context, '/flights_list_page');
-  }  void redirectReservation(){
+    Navigator.pushNamed(context, '/flight_list_page');
+  }
+  void redirectReservation(){
     Navigator.pop(context);
     Navigator.pushNamed(context, '/reservation_page');
   }
@@ -58,36 +61,74 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+      appBar: AppBar(
+        title: Text('CST2335 Final Group Project'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.help),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('Instructions'),
+                  content: Text('Select one of the modules to manage different aspects of the system.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: redirectCustomers,
+                  child: Text('Customer'),
+                ),
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: redirectAirplanes,
+                  child: Text('Airplane'),
+                ),
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: redirectFlights,
+                  child: Text('Flight'),
+                ),
+              ),
+              SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: redirectReservation,
+                  child: Text('Reservation'),
+                ),
+              ),
+            ],
+          ),
         ),
-        body: Center(
-        child: Column(
-         children: [ Text("hello world"),
-                  ElevatedButton(
-                    onPressed: redirectCustomers,
-                    child: const Text('Customers'),
-                  ),
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: redirectAirplanes,
-                    child: const Text('Airplanes'),
-                  ),
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: redirectFlights,
-                    child: const Text('Flights'),
-                  ),
-                  Spacer(),
-                  ElevatedButton(
-                    onPressed: redirectReservation,
-                    child: const Text('Reservation'),
-                  ),
-                ]
-            )
-    ));
+      ),
+    );
   }
 }
-
