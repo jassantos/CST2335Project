@@ -11,15 +11,20 @@ class _ReservationState extends State<Reservation>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      appBar: AppBar(
+        title: Text('Reservation Page'),
+        actions: [
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/',
+              (route) => false,
         ),
-        body: Center(
-            child: Column(
-                children: [ Text("Reservation Page"),]
-            )
-        )
+        child: const Icon(Icons.home),
+        tooltip: 'Back to Main',
+      ),
     );
   }
-
 }
