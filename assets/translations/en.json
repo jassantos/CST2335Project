@@ -1,0 +1,18 @@
+{
+  "customer_list": "Customer List",
+  "add_customer": "Add New Customer",
+  "first_name": "First Name",
+  "last_name": "Last Name",
+  "address": "Address",
+  "dob": "Date of Birth",
+  "cancel": "Cancel",
+  "add": "Add",
+  "missing_fields": "Missing Fields",
+  "fill_all_fields": "Please fill in all fields before adding the customer.",
+  "no_customers": "No customers available.",
+  "instructions": "Instructions",
+  "instructions_body": "Tap the \"+\" button to add a new customer.\n\nSelect a customer to view details or delete.\n\nAll data is saved to a local database.\n\nTap the house button to go back to the main page.",
+  "ok": "OK",
+  "close": "Close",
+  "customer_added": "Customer added."
+}

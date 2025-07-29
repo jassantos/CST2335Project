@@ -1,0 +1,18 @@
+{
+  "customer_list": "Lista de Clientes",
+  "add_customer": "Agregar Nuevo Cliente",
+  "first_name": "Nombre",
+  "last_name": "Apellido",
+  "address": "Dirección",
+  "dob": "Fecha de Nacimiento",
+  "cancel": "Cancelar",
+  "add": "Agregar",
+  "missing_fields": "Campos Faltantes",
+  "fill_all_fields": "Por favor, llena todos los campos antes de agregar el cliente.",
+  "no_customers": "No hay clientes disponibles.",
+  "instructions": "Instrucciones",
+  "instructions_body": "Toca el botón \"+\" para agregar un nuevo cliente.\n\nSelecciona un cliente para ver detalles o eliminarlo.\n\nTodos los datos se guardan en una base de datos local.\n\nToca el botón de casa para volver a la página principal.",
+  "ok": "Aceptar",
+  "close": "Cerrar",
+  "customer_added": "Cliente agregado."
+}
