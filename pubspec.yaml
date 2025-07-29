@@ -67,7 +67,7 @@ flutter:
   assets:
     - images/algonquin.jpg
     - assets/translations/en.json
-    - assets/translations/es-pe.json
+    - assets/translations/es.json
 
   #   - images/a_dot_ham.jpeg
 

@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const MyHomePage(title: 'CST2335 Final Group Project'),
-        '/customer_list_page': (context) => const CustomerListPage(),
+        '/customer_list_page': (context) => const CustomerListPage(title: '',),
         '/airplane_list_page': (context) => const AirplaneList(),
         '/flight_list_page': (context) => const FlightList(),
         '/reservation_page': (context) => const Reservation(),
