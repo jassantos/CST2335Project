@@ -6,13 +6,18 @@
   "address": "Address",
   "dob": "Date of Birth",
   "cancel": "Cancel",
-  "add": "Add",
+  "add": "Add a Customer",
   "missing_fields": "Missing Fields",
   "fill_all_fields": "Please fill in all fields before adding the customer.",
   "no_customers": "No customers available.",
+  "customers_details": "Select a client to see their details.",
   "instructions": "Instructions",
   "instructions_body": "Tap the \"+\" button to add a new customer.\n\nSelect a customer to view details or delete.\n\nAll data is saved to a local database.\n\nTap the house button to go back to the main page.",
   "ok": "OK",
   "close": "Close",
-  "customer_added": "Customer added."
+  "customer_added": "Customer added.",
+  "delete": "Delete"
+
+
+
 }

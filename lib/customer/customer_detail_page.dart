@@ -37,8 +37,8 @@ class CustomerDetailPage extends StatelessWidget {
                 if (showClose)
                   ElevatedButton.icon(
                     onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      Navigator.of(context).pop();
+                    },
                     icon: const Icon(Icons.close),
                     label: const Text('Close'),
                   ),

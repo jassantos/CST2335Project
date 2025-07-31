@@ -1,6 +1,4 @@
 import 'package:floor/floor.dart';
-import 'dart:async';
-
 import 'customer.dart';
 
 @dao
