@@ -15,9 +15,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'CST2335 Final Group Project',
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
-        '/home': (context) => const MyHomePage(title: 'CST2335 Final Group Project'),
+        '/': (context) => const MyHomePage(title: 'CST2335 Final Group Project'),
         '/customer_list_page': (context) => const LocalizedApp(),
         '/airplane_list_page': (context) => const AirplaneList(),
         '/flight_list_page': (context) => const FlightList(),
