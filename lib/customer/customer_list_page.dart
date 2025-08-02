@@ -79,7 +79,6 @@ class CustomerListPageState extends State<CustomerListPage> {
   final EncryptedSharedPreferences encryptedPrefs =
       EncryptedSharedPreferences();
 
-
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -185,6 +184,94 @@ class CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
+  ///updates the selected customers
+  void showUpdateDialog(Customer customer) {
+    final TextEditingController firstNameController = TextEditingController(
+      text: customer.firstName,
+    );
+    final TextEditingController lastNameController = TextEditingController(
+      text: customer.lastName,
+    );
+    final TextEditingController addressController = TextEditingController(
+      text: customer.address,
+    );
+    final TextEditingController dobController = TextEditingController(
+      text: customer.dob,
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Customer'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextField(
+                  controller: firstNameController,
+                  decoration: const InputDecoration(labelText: 'First Name'),
+                ),
+                TextField(
+                  controller: lastNameController,
+                  decoration: const InputDecoration(labelText: 'Last Name'),
+                ),
+                TextField(
+                  controller: addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                ),
+                TextField(
+                  controller: dobController,
+                  decoration: const InputDecoration(labelText: 'Date of Birth'),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cancel
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final updatedCustomer = Customer(
+                  customer.id, // preserve the original ID
+                  firstNameController.text.trim(),
+                  lastNameController.text.trim(),
+                  addressController.text.trim(),
+                  dobController.text.trim(),
+                );
+
+                await customerDao.updateCustomer(updatedCustomer);
+                await _refreshCustomerList();
+
+                setState(() {
+                  selectedCustomer = null;
+                });
+
+                Navigator.of(context).pop(); // close the dialog first
+
+                // then show snackbar after dialog closes
+                Future.microtask(() {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(content: Text('Customer updated')),
+                  );
+                });
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void updateSelectedCustomer() {
+    if (selectedCustomer == null) return;
+    showUpdateDialog(selectedCustomer!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -213,7 +300,7 @@ class CustomerListPageState extends State<CustomerListPage> {
     );
   }
 
-  /// Adjusts UI layout based on orientation/screen size
+  /// Adjusts UI layout based on orientation screen size
   Widget responsiveLayout() {
     var size = MediaQuery.of(context).size;
     var height = size.height;
@@ -227,13 +314,10 @@ class CustomerListPageState extends State<CustomerListPage> {
           Expanded(flex: 1, child: buildDetailsPane()),
         ],
       );
-    } else
-    {
+    } else {
       if (selectedCustomer == null) {
-
         return buildListView();
       } else {
-
         return buildDetailsPane();
       }
     }
@@ -323,6 +407,13 @@ class CustomerListPageState extends State<CustomerListPage> {
                   onPressed: deleteSelectedCustomer,
                   child: Text(
                     AppLocalizations.of(context)!.translate('delete')!,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: updateSelectedCustomer,
+                  child: Text(
+                    AppLocalizations.of(context)!.translate('update')!,
                   ),
                 ),
               ],

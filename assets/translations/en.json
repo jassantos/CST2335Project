@@ -18,7 +18,11 @@
   "customer_added": "Customer added.",
   "delete": "Delete",
   "english": "English",
-  "spanish": "Spanish"
+  "spanish": "Spanish",
+  "copy_or_blank_question": "Do you want to copy the previous customer’s info or start with a blank form?",
+  "copy": "Copy",
+  "blank": "Blank",
+  "update": "Update"
 
 
 

@@ -5,10 +5,10 @@ class Customer {
 
   @primaryKey
   final int id;
-  final String firstName;
-  final String lastName;
-  final String address;
-  final String dob;
+  late final String firstName;
+  late final String lastName;
+  late final String address;
+  late final String dob;
 
   static int ID = 1;
 

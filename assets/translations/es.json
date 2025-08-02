@@ -18,7 +18,11 @@
   "customer_added": "Cliente agregado.",
   "delete": "Eliminar",
   "english": "Ingles",
-  "spanish": "Español"
+  "spanish": "Español",
+  "copy_or_blank_question": "¿Desea copiar la informacion del anterior cliente o empezar en blanco?",
+  "copy": "Copiar",
+  "blank": "En blanco",
+  "update": "Actualizar"
 
 
 
