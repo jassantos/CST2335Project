@@ -341,7 +341,8 @@ class CustomerListPageState extends State<CustomerListPage> {
             Text(
               AppLocalizations.of(context)!.translate('instructions_body') ??
                   'Dialog body here.',
-              style: const TextStyle(fontSize: 16),
+              textAlign: TextAlign.justify,
+              style: const TextStyle(fontSize: 16, ),
             ),
             const SizedBox(height: 16),
             Align(

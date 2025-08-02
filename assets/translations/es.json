@@ -12,7 +12,7 @@
   "no_customers": "No hay clientes disponibles.",
   "customers_details": "Seleccione un cliente para ver su informacion.",
   "instructions": "Instrucciones",
-  "instructions_body": "Toca el botón \"+\" para agregar un nuevo cliente.\n\nSelecciona un cliente para ver detalles o eliminarlo.\n\nTodos los datos se guardan en una base de datos local.\n\nToca el botón de casa para volver a la página principal.",
+  "instructions_body": "Rellena los campos y pulsa \"Agregar\" para crear un nuevo cliente. Toca un cliente para ver sus detalles completos. En la vista de detalles, puedes Actualizar, Eliminar o Cerrar el panel del cliente. Tus datos se guardan de forma segura en una base de datos local. Pulsa el icono \uD83C\uDFE0 de casa para volver a la página principal. Usa el icono ❓ de ayuda para mostrar u ocultar estas instrucciones. También puedes cambiar el idioma entre inglés y español desde la barra superior.",
   "ok": "Aceptar",
   "close": "Cerrar",
   "customer_added": "Cliente agregado.",

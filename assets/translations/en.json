@@ -12,7 +12,7 @@
   "no_customers": "No customers available.",
   "customers_details": "Select a client to see their details.",
   "instructions": "Instructions",
-  "instructions_body": "Tap the \"+\" button to add a new customer.\n\nSelect a customer to view details or delete.\n\nAll data is saved to a local database.\n\nTap the house button to go back to the main page.",
+  "instructions_body": "Fill in the fields and tap \"Add\" to create a new customer. Tap on a customer to view their full details.In the detail view, you can Update, Delete, or Close the customer panel. Your data is saved securely in a local database. Tap the \uD83C\uDFE0 house icon to return to the main page.Use the ❓ help icon to toggle these instructions. You can also switch the language between English and Spanish from the top bar.",
   "ok": "OK",
   "close": "Close",
   "customer_added": "Customer added.",
