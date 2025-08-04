@@ -34,10 +34,12 @@ dependencies:
     sdk: flutter
   floor: ^1.4.0
 
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   encrypted_shared_preferences: ^3.0.1
+
   dartdoc: ^8.3.2
 
 dev_dependencies:
