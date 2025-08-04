@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'airplane/airplane_list_page.dart';
 import 'customer/customer_list_page.dart';
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const MyHomePage(title: 'CST2335 Final Group Project'),
-        '/customer_list_page': (context) => const CustomerList(),
+        '/customer_list_page': (context) => const LocalizedApp(),
         '/airplane_list_page': (context) => const AirplaneList(),
         '/flight_list_page': (context) => const FlightList(),
         '/reservation_page': (context) => const Reservation(),
