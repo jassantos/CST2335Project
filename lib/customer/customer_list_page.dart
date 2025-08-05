@@ -614,7 +614,7 @@ class CustomerListPageState extends State<CustomerListPage> {
                             '/customer_list_page':
                                 (context) => const LocalizedApp(),
                             '/airplane_list_page': (context) => const AirplaneList(),
-                            '/flight_list_page': (context) => const FlightList(),
+                            '/flight_list_page': (context) => const MyApp(),
                             '/reservation_page': (context) => const Reservation(),
                           },
                         ),

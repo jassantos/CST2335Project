@@ -5,6 +5,15 @@ import 'AirplaneDAO.dart';
 import 'AirplaneDatabase.dart';
 import 'Airplane.dart';
 
+/// A StatefulWidget that displays a list of airplanes and allows CRUD operations.
+///
+/// This widget manages the airplane list state and provides interfaces for:
+/// - Viewing airplane details
+/// - Adding new airplanes
+/// - Editing existing airplanes
+/// - Deleting airplanes
+///
+/// The layout adapts to screen size, showing a master-detail view on wide screens.
 class AirplaneList extends StatefulWidget {
   const AirplaneList({super.key});
 
@@ -12,6 +21,7 @@ class AirplaneList extends StatefulWidget {
   State<AirplaneList> createState() => _AirplaneListState();
 }
 
+/// The state class for [AirplaneList] that manages the airplane data and UI state.
 class _AirplaneListState extends State<AirplaneList> {
   final List<Airplane> _airplanes = [];
   Airplane? _selectedAirplane;
@@ -29,10 +39,12 @@ class _AirplaneListState extends State<AirplaneList> {
     _initializeDatabase();
   }
 
+  /// Loads the last airplane model used from encrypted shared preferences.
   Future<void> _loadLastModel() async {
     _lastModel = await _encryptedPrefs.getString('last_airplane_model') ?? '';
   }
 
+  /// Initializes the database and loads existing airplanes.
   Future<void> _initializeDatabase() async {
     final database = await $FloorAirplaneDatabase
         .databaseBuilder('airplane_database.db')
@@ -48,6 +60,9 @@ class _AirplaneListState extends State<AirplaneList> {
     });
   }
 
+  /// Builds the add airplane page widget.
+  ///
+  /// Returns a [Scaffold] with form fields for entering new airplane details.
   Widget _buildAddPage() {
     final modelController = TextEditingController(); // No pre-population
     final passengersController = TextEditingController();
@@ -154,6 +169,9 @@ class _AirplaneListState extends State<AirplaneList> {
     );
   }
 
+  /// Builds the edit airplane page widget.
+  ///
+  /// Returns a [Scaffold] with form fields pre-populated with the selected airplane's data.
   Widget _buildEditPage() {
     final modelController = TextEditingController(text: _selectedAirplane?.model);
     final passengersController =
@@ -258,6 +276,9 @@ class _AirplaneListState extends State<AirplaneList> {
     );
   }
 
+  /// Builds the details panel widget for the selected airplane.
+  ///
+  /// Returns a [Column] widget displaying the airplane's details and action buttons.
   Widget _buildDetailsPanel() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -298,6 +319,9 @@ class _AirplaneListState extends State<AirplaneList> {
     );
   }
 
+  /// Shows a confirmation dialog for airplane deletion.
+  ///
+  /// [airplane] The airplane to be deleted
   Future<void> _confirmDelete(Airplane airplane) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -330,6 +354,7 @@ class _AirplaneListState extends State<AirplaneList> {
     }
   }
 
+  /// Shows instructions dialog explaining how to use the app.
   void _showInstructions() {
     showDialog(
       context: context,
@@ -398,6 +423,11 @@ class _AirplaneListState extends State<AirplaneList> {
     );
   }
 
+  /// Builds the airplane list widget.
+  ///
+  /// Returns a responsive layout that shows either:
+  /// - A master-detail view on wide screens (>600px)
+  /// - A simple list view on narrow screens
   Widget _buildAirplaneList() {
     if (_airplanes.isEmpty) {
       return const Center(
