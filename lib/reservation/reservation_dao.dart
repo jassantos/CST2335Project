@@ -6,11 +6,11 @@ import 'reservation_entity.dart';
 abstract class reservation_dao {
 
   @Query('SELECT * FROM reservation_entity')
-  Future<List<reservation_entity>> findAllreservation_entities();
+  Future<List<reservation_entity>> findAllReservation_Entities();
 
   @Query('SELECT * FROM reservation_entity WHERE id = :id')
-  Stream<reservation_entity?> findreservation_entitiesById(int id);
+  Stream<reservation_entity?> findReservation_EntitiesById(int id);
 
   @insert
-  Future<void> insertreservation(reservation_entity reservation);
+  Future<void> insertReservation(reservation_entity reservation);
 }
