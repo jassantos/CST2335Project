@@ -114,7 +114,7 @@ class _$AirplaneDAO extends AirplaneDAO {
   _$AirplaneDAO(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database),
+  )   : _queryAdapter = QueryAdapter(database, changeListener),
         _airplaneInsertionAdapter = InsertionAdapter(
             database,
             'Airplane',
@@ -124,7 +124,8 @@ class _$AirplaneDAO extends AirplaneDAO {
                   'passengers': item.passengers,
                   'maxSpeed': item.maxSpeed,
                   'range': item.range
-                }),
+                },
+            changeListener),
         _airplaneUpdateAdapter = UpdateAdapter(
             database,
             'Airplane',
@@ -135,7 +136,8 @@ class _$AirplaneDAO extends AirplaneDAO {
                   'passengers': item.passengers,
                   'maxSpeed': item.maxSpeed,
                   'range': item.range
-                }),
+                },
+            changeListener),
         _airplaneDeletionAdapter = DeletionAdapter(
             database,
             'Airplane',
@@ -146,7 +148,8 @@ class _$AirplaneDAO extends AirplaneDAO {
                   'passengers': item.passengers,
                   'maxSpeed': item.maxSpeed,
                   'range': item.range
-                });
+                },
+            changeListener);
 
   final sqflite.DatabaseExecutor database;
 
@@ -169,6 +172,20 @@ class _$AirplaneDAO extends AirplaneDAO {
             row['passengers'] as int,
             row['maxSpeed'] as int,
             row['range'] as int));
+  }
+
+  @override
+  Stream<Airplane?> findAirplaneById(int id) {
+    return _queryAdapter.queryStream('SELECT * FROM Item WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Airplane(
+            row['id'] as int,
+            row['model'] as String,
+            row['passengers'] as int,
+            row['maxSpeed'] as int,
+            row['range'] as int),
+        arguments: [id],
+        queryableName: 'Item',
+        isView: false);
   }
 
   @override

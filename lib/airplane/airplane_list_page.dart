@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:encrypted_shared_preferences/encrypted_shared_preferences.dart';
 import 'AirplaneDAO.dart';
 import 'AirplaneDatabase.dart';
@@ -13,9 +14,13 @@ class AirplaneList extends StatefulWidget {
 
 class _AirplaneListState extends State<AirplaneList> {
   final List<Airplane> _airplanes = [];
+  Airplane? _selectedAirplane;
+  int? _selectedIndex;
   late AirplaneDAO airplaneDAO;
   final EncryptedSharedPreferences _encryptedPrefs = EncryptedSharedPreferences();
   String _lastModel = '';
+  bool _showAddPage = false;
+  bool _showEditPage = false;
 
   @override
   void initState() {
@@ -29,7 +34,9 @@ class _AirplaneListState extends State<AirplaneList> {
   }
 
   Future<void> _initializeDatabase() async {
-    final database = await $FloorAirplaneDatabase.databaseBuilder('airplane_database.db').build();
+    final database = await $FloorAirplaneDatabase
+        .databaseBuilder('airplane_database.db')
+        .build();
     airplaneDAO = database.airplaneDAO;
     final airplanes = await airplaneDAO.getAllAirplanes();
 
@@ -41,188 +48,286 @@ class _AirplaneListState extends State<AirplaneList> {
     });
   }
 
-  void _showAddAirplaneDialog({bool copyPrevious = false}) {
-    final modelController = TextEditingController();
+  Widget _buildAddPage() {
+    final modelController = TextEditingController(); // No pre-population
     final passengersController = TextEditingController();
     final speedController = TextEditingController();
     final rangeController = TextEditingController();
 
-    if (copyPrevious && _lastModel.isNotEmpty) {
-      modelController.text = _lastModel;
-    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add New Airplane'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            setState(() {
+              _showAddPage = false;
+            });
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: modelController,
+                decoration: const InputDecoration(
+                  labelText: 'Model',
+                  hintText: 'e.g., Boeing 747',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passengersController,
+                decoration: const InputDecoration(
+                  labelText: 'Passengers',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: speedController,
+                decoration: const InputDecoration(
+                  labelText: 'Max Speed (km/h)',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: rangeController,
+                decoration: const InputDecoration(
+                  labelText: 'Range (km)',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () async {
+                  if (modelController.text.isEmpty ||
+                      passengersController.text.isEmpty ||
+                      speedController.text.isEmpty ||
+                      rangeController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill all fields')));
+                    return;
+                  }
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Add Airplane'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: modelController,
-                  decoration: const InputDecoration(
-                    labelText: 'Model',
-                    hintText: 'e.g., Boeing 747',
-                  ),
-                ),
-                TextField(
-                  controller: passengersController,
-                  decoration: const InputDecoration(
-                    labelText: 'Passengers',
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: speedController,
-                  decoration: const InputDecoration(
-                    labelText: 'Max Speed',
-                    hintText: 'in km/h',
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: rangeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Range',
-                    hintText: 'in km',
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (modelController.text.isEmpty ||
-                    passengersController.text.isEmpty ||
-                    speedController.text.isEmpty ||
-                    rangeController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please fill all fields'))
+                  final newAirplane = Airplane(
+                    Airplane.ID++,
+                    modelController.text,
+                    int.parse(passengersController.text),
+                    int.parse(speedController.text),
+                    int.parse(rangeController.text),
                   );
-                  return;
-                }
 
-                final newAirplane = Airplane(
-                  Airplane.ID++,
-                  modelController.text,
-                  int.parse(passengersController.text),
-                  int.parse(speedController.text),
-                  int.parse(rangeController.text),
-                );
+                  await airplaneDAO.insertAirplane(newAirplane);
+                  await _encryptedPrefs.setString(
+                      'last_airplane_model', modelController.text);
 
-                await airplaneDAO.insertAirplane(newAirplane);
-                await _encryptedPrefs.setString('last_airplane_model', modelController.text);
+                  setState(() {
+                    _airplanes.add(newAirplane);
+                    _showAddPage = false;
+                    if (MediaQuery.of(context).size.width > 600) {
+                      _selectedAirplane = newAirplane;
+                      _selectedIndex = _airplanes.length - 1;
+                    }
+                  });
 
-                setState(() {
-                  _airplanes.add(newAirplane);
-                });
-
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${modelController.text} added successfully'))
-                );
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('${modelController.text} added successfully')));
+                },
+                child: const Text('Add Airplane'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  void _showAirplaneDetails(Airplane airplane, int index) {
-    final modelController = TextEditingController(text: airplane.model);
-    final passengersController = TextEditingController(text: airplane.passengers.toString());
-    final speedController = TextEditingController(text: airplane.maxSpeed.toString());
-    final rangeController = TextEditingController(text: airplane.range.toString());
+  Widget _buildEditPage() {
+    final modelController = TextEditingController(text: _selectedAirplane?.model);
+    final passengersController =
+    TextEditingController(text: _selectedAirplane?.passengers.toString());
+    final speedController =
+    TextEditingController(text: _selectedAirplane?.maxSpeed.toString());
+    final rangeController =
+    TextEditingController(text: _selectedAirplane?.range.toString());
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Airplane Details'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: modelController,
-                  decoration: const InputDecoration(
-                    labelText: 'Model',
-                  ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Edit Airplane'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            setState(() {
+              _showEditPage = false;
+            });
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: modelController,
+                decoration: const InputDecoration(
+                  labelText: 'Model',
+                  border: OutlineInputBorder(),
                 ),
-                TextField(
-                  controller: passengersController,
-                  decoration: const InputDecoration(
-                    labelText: 'Passengers',
-                  ),
-                  keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passengersController,
+                decoration: const InputDecoration(
+                  labelText: 'Passengers',
+                  border: OutlineInputBorder(),
                 ),
-                TextField(
-                  controller: speedController,
-                  decoration: const InputDecoration(
-                    labelText: 'Max Speed',
-                  ),
-                  keyboardType: TextInputType.number,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: speedController,
+                decoration: const InputDecoration(
+                  labelText: 'Max Speed (km/h)',
+                  border: OutlineInputBorder(),
                 ),
-                TextField(
-                  controller: rangeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Range',
-                  ),
-                  keyboardType: TextInputType.number,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: rangeController,
+                decoration: const InputDecoration(
+                  labelText: 'Range (km)',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      final updatedAirplane = Airplane(
+                        _selectedAirplane!.id,
+                        modelController.text,
+                        int.parse(passengersController.text),
+                        int.parse(speedController.text),
+                        int.parse(rangeController.text),
+                      );
+
+                      await airplaneDAO.updateAirplane(updatedAirplane);
+                      setState(() {
+                        _airplanes[_selectedIndex!] = updatedAirplane;
+                        _selectedAirplane = updatedAirplane;
+                        _showEditPage = false;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('${updatedAirplane.model} updated successfully')));
+                    },
+                    child: const Text('Save Changes'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _confirmDelete(_selectedAirplane!),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                    ),
+                    child: const Text('Delete', style: TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                await airplaneDAO.deleteAirplane(airplane);
-                setState(() {
-                  _airplanes.removeAt(index);
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${airplane.model} deleted successfully'))
-                );
-              },
-              child: const Text('Delete',
-                  style: TextStyle(color: Colors.red)),
-            ),
-            TextButton(
-              onPressed: () async {
-                final updatedAirplane = Airplane(
-                  airplane.id,
-                  modelController.text,
-                  int.parse(passengersController.text),
-                  int.parse(speedController.text),
-                  int.parse(rangeController.text),
-                );
-
-                await airplaneDAO.updateAirplane(updatedAirplane);
-                setState(() {
-                  _airplanes[index] = updatedAirplane;
-                });
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${airplane.model} updated successfully'))
-                );
-              },
-              child: const Text('Update'),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
     );
+  }
+
+  Widget _buildDetailsPanel() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _selectedAirplane!.model,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
+          Text('Passengers: ${_selectedAirplane!.passengers}'),
+          Text('Max Speed: ${_selectedAirplane!.maxSpeed} km/h'),
+          Text('Range: ${_selectedAirplane!.range} km'),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _showEditPage = true;
+                  });
+                },
+                child: const Text('Edit'),
+              ),
+              ElevatedButton(
+                onPressed: () => _confirmDelete(_selectedAirplane!),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                ),
+                child: const Text('Delete', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(Airplane airplane) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete ${airplane.model}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed ?? false) {
+      await airplaneDAO.deleteAirplane(airplane);
+      setState(() {
+        _airplanes.removeAt(_selectedIndex!);
+        _selectedAirplane = null;
+        _selectedIndex = null;
+        _showEditPage = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${airplane.model} deleted successfully')));
+    }
   }
 
   void _showInstructions() {
@@ -232,8 +337,8 @@ class _AirplaneListState extends State<AirplaneList> {
         return AlertDialog(
           title: const Text('Instructions'),
           content: const Text('1. Tap + to add a new airplane\n'
-              '2. Tap an airplane to view/edit details\n'
-              '3. Long press to delete an airplane'),
+              '2. Tap an airplane to view details\n'
+              '3. Edit or delete airplanes from the details view'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -247,6 +352,14 @@ class _AirplaneListState extends State<AirplaneList> {
 
   @override
   Widget build(BuildContext context) {
+    if (_showAddPage) {
+      return _buildAddPage();
+    }
+
+    if (_showEditPage && _selectedAirplane != null) {
+      return _buildEditPage();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Airplane List'),
@@ -262,7 +375,11 @@ class _AirplaneListState extends State<AirplaneList> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () => _showAddAirplaneDialog(),
+            onPressed: () {
+              setState(() {
+                _showAddPage = true;
+              });
+            },
             tooltip: 'Add Airplane',
             child: const Icon(Icons.add),
           ),
@@ -288,20 +405,68 @@ class _AirplaneListState extends State<AirplaneList> {
       );
     }
 
-    return ListView.builder(
-      itemCount: _airplanes.length,
-      itemBuilder: (context, index) {
-        final airplane = _airplanes[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: ListTile(
-            title: Text(airplane.model),
-            subtitle: Text('Passengers: ${airplane.passengers}'),
-            trailing: Text('${airplane.maxSpeed} km/h'),
-            onTap: () => _showAirplaneDetails(airplane, index),
+    final isWideScreen = MediaQuery.of(context).size.width > 600;
+
+    if (isWideScreen) {
+      return Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: ListView.builder(
+              itemCount: _airplanes.length,
+              itemBuilder: (context, index) {
+                final airplane = _airplanes[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  color: _selectedIndex == index
+                      ? Theme.of(context).colorScheme.primaryContainer
+                      : null,
+                  child: ListTile(
+                    title: Text(airplane.model),
+                    subtitle: Text('Passengers: ${airplane.passengers}'),
+                    trailing: Text('${airplane.maxSpeed} km/h'),
+                    onTap: () {
+                      setState(() {
+                        _selectedAirplane = airplane;
+                        _selectedIndex = index;
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
           ),
-        );
-      },
-    );
+          const VerticalDivider(width: 1),
+          Expanded(
+            flex: 2,
+            child: _selectedAirplane != null
+                ? _buildDetailsPanel()
+                : const Center(child: Text('Select an airplane')),
+          ),
+        ],
+      );
+    } else {
+      return ListView.builder(
+        itemCount: _airplanes.length,
+        itemBuilder: (context, index) {
+          final airplane = _airplanes[index];
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              title: Text(airplane.model),
+              subtitle: Text('Passengers: ${airplane.passengers}'),
+              trailing: Text('${airplane.maxSpeed} km/h'),
+              onTap: () {
+                setState(() {
+                  _selectedAirplane = airplane;
+                  _selectedIndex = index;
+                  _showEditPage = true;
+                });
+              },
+            ),
+          );
+        },
+      );
+    }
   }
 }
