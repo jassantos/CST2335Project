@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../airplane/airplane_list_page.dart';
+import '../flight/flight_list_page.dart';
 import '../main.dart';
+import '../reservation/reservation_page.dart';
 import 'customer.dart';
 import 'customer_database.dart';
 import 'customer_dao.dart';
@@ -610,6 +613,9 @@ class CustomerListPageState extends State<CustomerListPage> {
                                 ),
                             '/customer_list_page':
                                 (context) => const LocalizedApp(),
+                            '/airplane_list_page': (context) => const AirplaneList(),
+                            '/flight_list_page': (context) => const FlightList(),
+                            '/reservation_page': (context) => const Reservation(),
                           },
                         ),
                   ),

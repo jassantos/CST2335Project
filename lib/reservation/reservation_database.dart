@@ -7,7 +7,7 @@ import 'reservation_entity.dart';
 ///where the generated database code is
 part 'reservation_database.g.dart';
 
-@Database(version: 1, entities: [reservation_entity])
+@Database(version: 2, entities: [reservation_entity])
 abstract class AppDatabase extends FloorDatabase {
   reservation_dao get dao;
 }
