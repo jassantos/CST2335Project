@@ -10,21 +10,27 @@
   "missing_fields": "Campos Faltantes",
   "fill_all_fields": "Por favor, llena todos los campos antes de agregar el cliente.",
   "no_customers": "No hay clientes disponibles.",
-  "customers_details": "Seleccione un cliente para ver su informacion.",
+  "customers_details": "Seleccione un cliente para ver su información.",
   "instructions": "Instrucciones",
-  "instructions_body": "Rellena los campos y pulsa \"Agregar\" para crear un nuevo cliente. Toca un cliente para ver sus detalles completos. En la vista de detalles, puedes Actualizar, Eliminar o Cerrar el panel del cliente. Tus datos se guardan de forma segura en una base de datos local. Pulsa el icono \uD83C\uDFE0 de casa para volver a la página principal. Usa el icono ❓ de ayuda para mostrar u ocultar estas instrucciones. También puedes cambiar el idioma entre inglés y español desde la barra superior.",
+  "instructions_body": "Rellena los campos y pulsa \"Agregar\" para crear un nuevo cliente. Toca un cliente para ver sus detalles completos. En la vista de detalles puedes Actualizar, Eliminar o Cerrar el panel del cliente. Tus datos se guardan de forma segura en una base de datos local. Pulsa el icono 🏠 para volver a la página principal. Usa el icono ❓ para mostrar u ocultar estas instrucciones. También puedes cambiar el idioma entre inglés y español desde la barra superior.",
   "ok": "Aceptar",
   "close": "Cerrar",
   "customer_added": "Cliente agregado.",
   "delete": "Eliminar",
-  "english": "Ingles",
+  "english": "Inglés",
   "spanish": "Español",
-  "copy_or_blank_question": "¿Desea copiar la informacion del anterior cliente o empezar en blanco?",
+  "copy_or_blank_question": "¿Desea copiar la información del cliente anterior o empezar en blanco?",
   "copy": "Copiar",
   "blank": "En blanco",
-  "update": "Actualizar"
-
-
-
-
+  "update": "Actualizar",
+  "flight_list": "Lista de Vuelos",
+  "departure": "Salida",
+  "destination": "Destino",
+  "departure_time": "Hora de Salida",
+  "arrival_time": "Hora de Llegada",
+  "add_flight": "Agregar Vuelo",
+  "fill_fields": "Complete todos los campos",
+  "no_flights": "No hay vuelos disponibles.",
+  "help_ttl": "Instrucciones",
+  "help_txt": "Rellena los campos y pulsa \"Agregar Vuelo\" para crear una nueva ruta. Pulsa una fila para ver los detalles completos. En la vista de detalle puedes Actualizar, Eliminar o Cerrar el panel. Tus datos se guardan de forma segura en una base de datos local. Pulsa el icono 🏠 para volver a la página principal. Usa el icono ❓ para mostrar u ocultar estas instrucciones. También puedes cambiar el idioma entre Inglés y Español desde la barra superior."
 }
