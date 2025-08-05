@@ -1,227 +1,342 @@
+// lib/flight/flight_list_page.dart
+
 import 'package:flutter/material.dart';
+import '../main.dart';                       // MyApp + MyHomePage
+import '../customer/AppLocalizations.dart'; // shared JSON-loader
 import 'flight.dart';
 import 'flight_database.dart';
 import 'flight_dao.dart';
 
-class FlightList extends StatefulWidget {
-  const FlightList({super.key});
+/// Flight list screen with ENG/ESP toggle, “?” help, and Home button.
+/// All text comes from `assets/translations/{en,es}.json`.
+class FlightListPage extends StatefulWidget {
+  const FlightListPage({super.key});
+
+  /// Allow language switching from inside this page
+  static void setLocale(BuildContext context, Locale locale) {
+    MyApp.setLocale(context, locale);
+  }
 
   @override
-  State<FlightList> createState() => _FlightListState();
+  State<FlightListPage> createState() => _FlightListPageState();
 }
 
-class _FlightListState extends State<FlightList> {
-  late FlightDatabase db;
-  late FlightDao dao;
-  List<Flight> flights = [];
+class _FlightListPageState extends State<FlightListPage> {
+  // ────────── DB ──────────
+  late FlightDatabase _db;
+  late FlightDao      _dao;
 
-  final _depC = TextEditingController();
-  final _dstC = TextEditingController();
+  // ────────── UI state ──────────
+  final _depC  = TextEditingController();
+  final _dstC  = TextEditingController();
   final _depTC = TextEditingController();
   final _arrTC = TextEditingController();
 
-  Flight? selected;
+  List<Flight> _flights = [];
+  Flight?      _selected;
 
   @override
   void initState() {
     super.initState();
-    _initDb();
+    _openDb();
   }
 
-  Future<void> _initDb() async {
-    db = await $FloorFlightDatabase
+  Future<void> _openDb() async {
+    _db  = await $FloorFlightDatabase
         .databaseBuilder('flight_database.db')
         .build();
-    dao = db.flightDao;
-    await _refresh();
+    _dao = _db.flightDao;
+    _refreshFlights();
   }
 
-  Future<void> _refresh() async {
-    flights = await dao.findAllFlights();
-    if (mounted) setState(() {});
+  Future<void> _refreshFlights() async {
+    final list = await _dao.findAllFlights();
+    if (!mounted) return;
+    setState(() => _flights = list);
   }
 
-  // ---------- CRUD ----------
-  Future<void> _add() async {
+  void _insert() async {
     if ([_depC, _dstC, _depTC, _arrTC].any((c) => c.text.trim().isEmpty)) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Fill all fields')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!
+                .translate('fill_fields') ??
+                'Fill all fields',
+          ),
+        ),
+      );
       return;
     }
-    final flight = Flight(
-      departure: _depC.text.trim(),
-      destination: _dstC.text.trim(),
-      departureTime: _depTC.text.trim(),
-      arrivalTime: _arrTC.text.trim(),
+    await _dao.insertFlight(
+      Flight(
+        departure     : _depC.text.trim(),
+        destination   : _dstC.text.trim(),
+        departureTime : _depTC.text.trim(),
+        arrivalTime   : _arrTC.text.trim(),
+      ),
     );
-    await dao.insertFlight(flight);
+    _clearFields();
+    _refreshFlights();
+  }
+
+  void _update(Flight f) async {
+    await _dao.updateFlight(f);
+    _refreshFlights();
+  }
+
+  void _delete(Flight f) async {
+    await _dao.deleteFlight(f);
+    if (_selected?.id == f.id) _selected = null;
+    _refreshFlights();
+  }
+
+  void _clearFields() {
     _depC.clear();
     _dstC.clear();
     _depTC.clear();
     _arrTC.clear();
-    await _refresh();
   }
 
-  Future<void> _delete(Flight f) async {
-    await dao.deleteFlight(f);
-    selected = null;
-    await _refresh();
-  }
-
-  Future<void> _update(Flight original, Flight updated) async {
-    await dao.updateFlight(updated);
-    selected = null;
-    await _refresh();
-  }
-  // ---------------------------
-
-  Widget _field(String label, TextEditingController c) =>
-      TextField(controller: c, decoration: InputDecoration(labelText: label));
-
-  void _showEditDialog(Flight f) {
-    final dep = TextEditingController(text: f.departure);
-    final dst = TextEditingController(text: f.destination);
-    final depT = TextEditingController(text: f.departureTime);
-    final arrT = TextEditingController(text: f.arrivalTime);
+  void _showEditDialog(Flight flight) {
+    final dep     = TextEditingController(text: flight.departure);
+    final dst     = TextEditingController(text: flight.destination);
+    final depTime = TextEditingController(text: flight.departureTime);
+    final arrTime = TextEditingController(text: flight.arrivalTime);
+    final loc     = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Update Flight'),
+        title: Text(loc.translate('update') ?? 'Update'),
         content: SingleChildScrollView(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _field('Departure', dep),
-              _field('Destination', dst),
-              _field('Departure Time', depT),
-              _field('Arrival Time', arrT),
+              _buildText(dep, loc.translate('departure') ?? 'Departure'),
+              _buildText(dst, loc.translate('destination') ?? 'Destination'),
+              _buildText(depTime, loc.translate('departure_time') ?? 'Departure Time'),
+              _buildText(arrTime, loc.translate('arrival_time') ?? 'Arrival Time'),
             ],
           ),
         ),
         actions: [
           TextButton(
-            onPressed: Navigator.of(context).pop,
-            child: const Text('Cancel'),
+            child: Text(loc.translate('cancel') ?? 'Cancel'),
+            onPressed: () => Navigator.pop(context),
           ),
           ElevatedButton(
+            child: Text(loc.translate('save') ?? 'Save'),
             onPressed: () {
               final updated = Flight(
-                id: f.id,
-                departure: dep.text.trim(),
-                destination: dst.text.trim(),
-                departureTime: depT.text.trim(),
-                arrivalTime: arrT.text.trim(),
+                id           : flight.id,
+                departure    : dep.text.trim(),
+                destination  : dst.text.trim(),
+                departureTime: depTime.text.trim(),
+                arrivalTime  : arrTime.text.trim(),
               );
-              _update(f, updated);
+              _update(updated);
               Navigator.pop(context);
             },
-            child: const Text('Save'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildText(TextEditingController c, String hint) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: TextField(
+        controller: c,
+        decoration: InputDecoration(labelText: hint),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
-        leading: Navigator.canPop(context)
-            ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        )
-            : null,
-        title: const Text('Flight List Page'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text(loc.translate('flight_list') ?? 'Flight List'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            tooltip: 'Go Home',
-            onPressed: () => Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/',
-                  (_) => false,
+          OutlinedButton(
+            onPressed: () => FlightListPage.setLocale(context, const Locale('en')),
+            child: Text(loc.translate('english') ?? 'English'),
+          ),
+          const SizedBox(width: 8),
+          OutlinedButton(
+            onPressed: () => FlightListPage.setLocale(context, const Locale('es')),
+            child: Text(loc.translate('spanish') ?? 'Spanish'),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
+      body: Stack(
+        children: [
+          _selected == null
+              ? _buildListView(loc)
+              : _buildDetailsView(loc),
+
+          // help “?” at bottom-left
+          Positioned(
+            left: 8,
+            bottom: 8,
+            child: IconButton(
+              icon: const Icon(Icons.help),
+              onPressed: () => _showHelpDialog(loc),
+            ),
+          ),
+
+          // 🏠 home at bottom-center
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              minimum: const EdgeInsets.only(bottom: 8),
+              child: IconButton(
+                iconSize: 28,
+                icon: const Icon(Icons.house),
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (_) => const MyHomePage(title: 'CST2335 Final Group Project'),
+                    ),
+                        (_) => false,
+                  );
+                },
+              ),
             ),
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: selected == null ? _buildList() : _buildDetails(),
+    );
+  }
+
+  Widget _buildListView(AppLocalizations loc) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _depC,
+                  decoration: InputDecoration(labelText: loc.translate('departure') ?? 'Departure'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _dstC,
+                  decoration: InputDecoration(labelText: loc.translate('destination') ?? 'Destination'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _depTC,
+                  decoration: InputDecoration(labelText: loc.translate('departure_time') ?? 'Departure Time'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextField(
+                  controller: _arrTC,
+                  decoration: InputDecoration(labelText: loc.translate('arrival_time') ?? 'Arrival Time'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: _insert,
+            child: Text(loc.translate('add_flight') ?? 'Add Flight'),
+          ),
+          const SizedBox(height: 24),
+          _flights.isEmpty
+              ? Text(loc.translate('no_flights') ?? 'No flights available.')
+              : ListView.separated(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: _flights.length,
+            separatorBuilder: (_, __) => const Divider(),
+            itemBuilder: (_, i) {
+              final f = _flights[i];
+              return ListTile(
+                title: Text('${f.departure} → ${f.destination}'),
+                subtitle: Text('${f.departureTime} → ${f.arrivalTime}'),
+                onTap: () => setState(() => _selected = f),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
-  // -------- list view ----------
-  Widget _buildList() => Column(
-    children: [
-      Row(
+  Widget _buildDetailsView(AppLocalizations loc) {
+    final f = _selected!;
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(child: _field('Departure', _depC)),
-          const SizedBox(width: 12),
-          Expanded(child: _field('Destination', _dstC)),
+          Text('${f.departure} → ${f.destination}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          Text('${loc.translate('departure_time') ?? 'Departure Time'}: ${f.departureTime}'),
+          Text('${loc.translate('arrival_time')   ?? 'Arrival Time'}:   ${f.arrivalTime}'),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              ElevatedButton(
+                child: Text(loc.translate('close') ?? 'Close'),
+                onPressed: () => setState(() => _selected = null),
+              ),
+              const SizedBox(width: 12),
+              ElevatedButton( child: Text(loc.translate('update') ?? 'Update'), onPressed: () => _showEditDialog(f)),
+              const SizedBox(width: 12),
+              ElevatedButton( child: Text(loc.translate('delete') ?? 'Delete'), onPressed: () => _delete(f)),
+            ],
+          ),
         ],
       ),
-      const SizedBox(height: 12),
-      Row(
-        children: [
-          Expanded(child: _field('Departure Time', _depTC)),
-          const SizedBox(width: 12),
-          Expanded(child: _field('Arrival Time', _arrTC)),
-        ],
-      ),
-      const SizedBox(height: 12),
-      ElevatedButton(onPressed: _add, child: const Text('Add Flight')),
-      const SizedBox(height: 16),
-      Expanded(
-        child: flights.isEmpty
-            ? const Center(child: Text('No flights yet'))
-            : ListView.builder(
-          itemCount: flights.length,
-          itemBuilder: (_, i) {
-            final f = flights[i];
-            return ListTile(
-              title: Text('${f.departure} → ${f.destination}'),
-              onTap: () => setState(() => selected = f),
-            );
-          },
-        ),
-      ),
-    ],
-  );
-
-  // -------- detail view ----------
-  Widget _buildDetails() {
-    final f = selected!;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Departure: ${f.departure}', style: const TextStyle(fontSize: 18)),
-        Text('Destination: ${f.destination}', style: const TextStyle(fontSize: 18)),
-        Text('Departure Time: ${f.departureTime}',
-            style: const TextStyle(fontSize: 18)),
-        Text('Arrival Time: ${f.arrivalTime}',
-            style: const TextStyle(fontSize: 18)),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            ElevatedButton(
-              onPressed: () => setState(() => selected = null),
-              child: const Text('Close'),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton(
-              onPressed: () => _showEditDialog(f),
-              child: const Text('Update'),
-            ),
-            const SizedBox(width: 12),
-            ElevatedButton(
-              onPressed: () => _delete(f),
-              child: const Text('Delete'),
-            ),
-          ],
-        ),
-      ],
     );
+  }
+
+  void _showHelpDialog(AppLocalizations loc) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(loc.translate('help_ttl') ?? 'Instructions'),
+        content: Text(loc.translate('help_txt') ??
+            'Fill all fields and tap “Add Flight”.\n'
+                'Tap a row to view, Update or Delete.\n'
+                'Use the language toggle for English / Spanish.'),
+        actions: [
+          TextButton(
+            child: Text(loc.translate('close') ?? 'Close'),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _depC.dispose();
+    _dstC.dispose();
+    _depTC.dispose();
+    _arrTC.dispose();
+    _db.close();
+    super.dispose();
   }
 }

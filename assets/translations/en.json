@@ -12,7 +12,7 @@
   "no_customers": "No customers available.",
   "customers_details": "Select a client to see their details.",
   "instructions": "Instructions",
-  "instructions_body": "Fill in the fields and tap \"Add\" to create a new customer. Tap on a customer to view their full details.In the detail view, you can Update, Delete, or Close the customer panel. Your data is saved securely in a local database. Tap the \uD83C\uDFE0 house icon to return to the main page.Use the ❓ help icon to toggle these instructions. You can also switch the language between English and Spanish from the top bar.",
+  "instructions_body": "Fill in the fields and tap \"Add\" to create a new customer. Tap on a customer to view their full details. In the detail view, you can Update, Delete, or Close the customer panel. Your data is saved securely in a local database. Tap the 🏠 house icon to return to the main page. Use the ❓ help icon to toggle these instructions. You can also switch the language between English and Spanish from the top bar.",
   "ok": "OK",
   "close": "Close",
   "customer_added": "Customer added.",
@@ -22,8 +22,15 @@
   "copy_or_blank_question": "Do you want to copy the previous customer’s info or start with a blank form?",
   "copy": "Copy",
   "blank": "Blank",
-  "update": "Update"
-
-
-
+  "update": "Update",
+  "flight_list": "Flight List Page",
+  "departure": "Departure",
+  "destination": "Destination",
+  "departure_time": "Departure Time",
+  "arrival_time": "Arrival Time",
+  "add_flight": "Add Flight",
+  "fill_fields": "Fill all fields",
+  "no_flights": "No flights available.",
+  "help_ttl": "Instructions",
+  "help_txt": "Fill in the fields and tap \"Add Flight\" to create a new route. Tap on a row to view full details. In the detail view, you can Update, Delete, or Close the panel. Your data is saved securely in a local database. Tap the 🏠 house icon to return to the main page. Use the ❓ help icon to toggle these instructions. You can also switch the language between English and Spanish from the top bar."
 }
